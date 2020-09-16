@@ -3,8 +3,12 @@ import os
 MOTOR_MAX_ANGLE = 700
 MOTOR_MIN_ANGLE = 500
 
+THUMB_MOTOR_MAX_ANGLE = 600
+THUMB_MOTOR_MIN_ANGLE = 430
+
 PALM_MOTOR_MAX_ANGLE = 750
 PALM_MOTOR_MIN_ANGLE = 600
+
 
 MIDDLE_MOTOR_ID = 13
 INDEX_MOTOR_ID  = 14
@@ -143,7 +147,7 @@ class AX12A_Handler:
             #    dxl_goal_position = self.AngleFilter(dxl_goal_position)
             #    goalDict[DXL_ID] = dxl_goal_position
             #    #print("Converted to {}".format(dxl_goal_position))
-            if DXL_ID != PALM_MOTOR_ID:
+            if DXL_ID != PALM_MOTOR_ID and DXL_ID != THUMB_MOTOR_ID:
                 if dxl_goal_position > MOTOR_MAX_ANGLE:
                     dxl_goal_position = MOTOR_MAX_ANGLE
                     goalDict[DXL_ID] = dxl_goal_position
@@ -153,14 +157,22 @@ class AX12A_Handler:
                     goalDict[DXL_ID] = dxl_goal_position
                     #print("UNDER:{}".format(goalDict[DXL_ID]))
             else:
-                if dxl_goal_position > PALM_MOTOR_MAX_ANGLE:
-                    dxl_goal_position = PALM_MOTOR_MAX_ANGLE
-                    goalDict[DXL_ID] = dxl_goal_position
-                    #print("OVER:{}".format(goalDict[DXL_ID]))
-                elif dxl_goal_position < PALM_MOTOR_MIN_ANGLE:
-                    dxl_goal_position = PALM_MOTOR_MIN_ANGLE
-                    goalDict[DXL_ID] = dxl_goal_position
-                    #print("UNDER:{}".format(goalDict[DXL_ID]))
+                if DXL_ID == THUMB_MOTOR_ID:
+                    if dxl_goal_position > THUMB_MOTOR_MAX_ANGLE:
+                        dxl_goal_position = THUMB_MOTOR_MAX_ANGLE
+                        goalDict[DXL_ID] = dxl_goal_position
+                        #print("OVER:{}".format(goalDict[DXL_ID]))
+                    elif dxl_goal_position < THUMB_MOTOR_MIN_ANGLE:
+                        dxl_goal_position = THUMB_MOTOR_MIN_ANGLE
+                        goalDict[DXL_ID] = dxl_goal_position
+                elif DXL_ID == PALM_MOTOR_ID:
+                    if dxl_goal_position > PALM_MOTOR_MAX_ANGLE:
+                        dxl_goal_position = PALM_MOTOR_MAX_ANGLE
+                        goalDict[DXL_ID] = dxl_goal_position
+                        #print("OVER:{}".format(goalDict[DXL_ID]))
+                    elif dxl_goal_position < PALM_MOTOR_MIN_ANGLE:
+                        dxl_goal_position = PALM_MOTOR_MIN_ANGLE
+                        goalDict[DXL_ID] = dxl_goal_position
             allocate_goal_position(dxl_goal_position = dxl_goal_position, DXL_ID = DXL_ID, groupSyncWrite = self.groupSyncWrite)
             isGoal.update({DXL_ID : 0})
         

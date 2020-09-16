@@ -80,11 +80,13 @@ CURRENT_HAND_POSE = {MIDDLE_MOTOR_ID : HAND_MIN_ANGLE, INDEX_MOTOR_ID : HAND_MIN
 angle_dct = dict()
 AX12A_Hnd = AX12A_Handler(DXL_IDs=DXL_IDs, DEVICENAME="/dev/ttyUSB0", HAND_MAX_ANGLE=HAND_MAX_ANGLE, HAND_MIN_ANGLE=HAND_MIN_ANGLE, CONVERT_UNIT=True)
 
-def AngleFilter(angle, isPalm=False):
-    if not isPalm:
-        result = int(MyAX12A.MOTOR_MIN_ANGLE + (angle - HAND_MIN_ANGLE) / (HAND_MAX_ANGLE - HAND_MIN_ANGLE) * (MyAX12A.MOTOR_MAX_ANGLE - MyAX12A.MOTOR_MIN_ANGLE))
-    else:
+def AngleFilter(angle, FingerType):
+    if FingerType == THUMB_MOTOR_ID:
+        result = int(MyAX12A.THUMB_MOTOR_MAX_ANGLE - (angle - PALM_MIN_ANGLE) / (PALM_MAX_ANGLE - PALM_MIN_ANGLE) * (MyAX12A.THUMB_MOTOR_MAX_ANGLE - MyAX12A.THUMB_MOTOR_MIN_ANGLE))
+    elif FingerType == PALM_MOTOR_ID:
         result = int(MyAX12A.PALM_MOTOR_MIN_ANGLE + (angle - PALM_MIN_ANGLE) / (PALM_MAX_ANGLE - PALM_MIN_ANGLE) * (MyAX12A.PALM_MOTOR_MAX_ANGLE - MyAX12A.PALM_MOTOR_MIN_ANGLE))
+    else:
+        result = int(MyAX12A.MOTOR_MIN_ANGLE + (angle - HAND_MIN_ANGLE) / (HAND_MAX_ANGLE - HAND_MIN_ANGLE) * (MyAX12A.MOTOR_MAX_ANGLE - MyAX12A.MOTOR_MIN_ANGLE))
     #print("RESULT:{}".format(result))
     return result
 
@@ -118,7 +120,7 @@ while hasFrame:
         for target_part, VAL in angle_target.items():
             if VAL[1] == PALM_MOTOR_ID:
                 print("THUMB:{}".format(calc_angle(VAL[0], points)))
-            angle_dct.update({VAL[1] : AngleFilter(calc_angle(VAL[0], points), isPalm=VAL[1] == PALM_MOTOR_ID)})
+            angle_dct.update({VAL[1] : AngleFilter(calc_angle(VAL[0], points), FingerType=VAL[1])})
         #AX12A_Hnd.ControlPos(angle_dct)
     print(angle_dct)
     cv2.imshow(WINDOW, frame)
